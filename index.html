@@ -457,10 +457,6 @@ body {
     <div id="ov-zone">Exterior Approach — South-West</div>
   </div>
 
-  <div id="legend-box">
-    <div class="lg"><div class="lg-d" style="background:#e87722"></div>DTS equipment / cable detail</div>
-    <div class="lg"><div class="lg-d" style="background:#4a9eff"></div>Move to next scene</div>
-  </div>
 </div>
 
 <!-- ── MODAL ───────────────────────────────────────── -->
@@ -554,6 +550,9 @@ const SCENES = {
   br7: { title: 'Compressor House — Room B',    zone: 'Aircon Compressor House · Equipment Space',        panorama: 'Panorama27.jpg', yaw: 0, hotSpots: [ hs_scene(0,150,'← Room A','br6'), hs_scene(0,-30,'Continue →','br8'), hs_scene(8,60,'→ Cold Store Zone H','cs9') ] },
   br8: { title: 'Compressor House — Room C',    zone: 'Aircon Compressor House · Equipment Space',        panorama: 'Panorama28.jpg', yaw: 0, hotSpots: [ hs_scene(0,150,'← Room B','br7'), hs_scene(8,60,'→ Cold Store Zone H','cs9'), hs_scene(0,-30,'Return to Overview','ext_sw') ] },
 };
+
+function hs_info() { return {}; }
+function hs_scene() { return {}; }
 
 // ─── Sidebar (mobile) ─────────────────────────────────────────────────────────
 
