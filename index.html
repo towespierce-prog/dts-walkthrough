@@ -129,25 +129,6 @@ body {
 
 #panorama { width: 100%; height: 100%; }
 
-/* Pannellum overrides */
-.pnlm-hotspot.pnlm-info {
-  background-image: none !important;
-  background-color: rgba(232, 119, 34, 0.88) !important;
-  border: 2px solid rgba(255,255,255,0.85) !important;
-  border-radius: 50% !important;
-  width: 26px !important;
-  height: 26px !important;
-}
-.pnlm-hotspot.pnlm-info:hover { background-color: #e87722 !important; }
-.pnlm-tooltip {
-  background: rgba(12,12,12,0.94) !important;
-  color: #eee !important;
-  border: 1px solid #333 !important;
-  border-radius: 4px !important;
-  font-size: 12px !important;
-  padding: 5px 10px !important;
-  white-space: nowrap !important;
-}
 
 /* Hamburger — hidden on desktop */
 #hamburger {
@@ -210,36 +191,6 @@ body {
 }
 #zone-badge.visible { display: block; }
 
-/* Fixed zone navigation arrows — overlaid on viewer, not Pannellum hotspots */
-.zone-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(12,12,12,0.82);
-  border: 1.5px solid #e87722;
-  border-radius: 20px;
-  color: #e87722;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 8px 16px;
-  cursor: pointer;
-  z-index: 998;
-  white-space: nowrap;
-  display: none;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition: background 0.15s, color 0.15s;
-}
-.zone-nav:hover, .zone-nav:active {
-  background: rgba(232,119,34,0.92);
-  color: #fff;
-}
-.zone-nav.visible { display: block; }
-.zone-nav { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
-#zone-prev { left: 14px; }
-#zone-next { right: 14px; }
 
 /* Client logo — top-right overlay */
 #client-logo {
@@ -498,10 +449,6 @@ body {
 
   <!-- Zone badge — current zone, top centre -->
   <div id="zone-badge"></div>
-  <!-- Zone nav — fixed left/right pills showing adjacent zone names -->
-  <div id="zone-prev" class="zone-nav" onclick="navStep(-1)"></div>
-  <div id="zone-next" class="zone-nav" onclick="navStep(1)"></div>
-
   <!-- Hamburger button — mobile only -->
   <button id="hamburger" onclick="openSidebar()" aria-label="Open menu">&#9776;</button>
 
@@ -572,16 +519,6 @@ const SEQ = [
   'br1','br2','br3','br4','br5','br6','br7','br8'
 ];
 
-function hs_info(pitch, yaw, text, imgKey) {
-  return {
-    type: 'info', pitch, yaw, text,
-    clickHandlerFunc: (e, a) => { e.stopPropagation(); openModal(a.k); },
-    clickHandlerArgs: { k: imgKey }
-  };
-}
-function hs_scene(pitch, yaw, text, sceneId) {
-  return { type: 'scene', pitch, yaw, text, sceneId };
-}
 
 const SCENES = {
   ext_sw:  { title: 'Site Overview', zone: 'Exterior Approach — South-West', panorama: 'Panorama30.jpg', yaw: 60,  hotSpots: [ hs_scene(0,100,'East View →','ext_se'), hs_scene(0,-60,'← North-West','ext_nw') ] },
@@ -636,7 +573,7 @@ let viewer, current = 'ext_sw';
 function buildConfig() {
   const out = {};
   for (const [id, s] of Object.entries(SCENES)) {
-    out[id] = { title: s.title, panorama: s.panorama, yaw: s.yaw || 0, pitch: 0, hotSpots: s.hotSpots || [] };
+    out[id] = { title: s.title, panorama: s.panorama, yaw: s.yaw || 0, pitch: 0, hotSpots: [] };
   }
   return out;
 }
@@ -657,10 +594,6 @@ function go(id) {
   closeSidebar();
 }
 
-function navStep(dir) {
-  const next = SEQ[SEQ.indexOf(current) + dir];
-  if (next) go(next);
-}
 
 function activate(id) {
   current = id;
@@ -677,20 +610,6 @@ function activate(id) {
     if (s.zoneLbl) { badge.textContent = s.zoneLbl; badge.classList.add('visible'); }
     else { badge.classList.remove('visible'); }
 
-    const prevEl = document.getElementById('zone-prev');
-    const nextEl = document.getElementById('zone-next');
-    const prevId = SEQ[idx - 1];
-    const nextId = SEQ[idx + 1];
-    if (prevId) {
-      const ps = SCENES[prevId];
-      prevEl.textContent = '← ' + (ps.zoneLbl || ps.title);
-      prevEl.classList.add('visible');
-    } else { prevEl.classList.remove('visible'); }
-    if (nextId) {
-      const ns = SCENES[nextId];
-      nextEl.textContent = (ns.zoneLbl || ns.title) + ' →';
-      nextEl.classList.add('visible');
-    } else { nextEl.classList.remove('visible'); }
   }
 }
 
