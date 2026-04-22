@@ -186,6 +186,47 @@ body {
 #ov-title { font-size: 16px; font-weight: 700; color: #fff; }
 #ov-zone { font-size: 11px; color: #e87722; margin-top: 2px; }
 
+#zone-badge {
+  display: none;
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(232,119,34,0.92);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+#zone-badge.visible { display: block; }
+
+/* Floating zone label hotspots */
+.pnlm-hotspot.zone-lbl {
+  background: rgba(20,20,20,0.82) !important;
+  border: 1.5px solid rgba(232,119,34,0.7) !important;
+  border-radius: 14px !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 5px 12px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #e87722 !important;
+  letter-spacing: 1px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+.pnlm-hotspot.zone-lbl:hover {
+  background: rgba(232,119,34,0.9) !important;
+  color: #fff !important;
+}
+
 #nav-btns {
   position: absolute;
   bottom: 18px;
@@ -436,6 +477,9 @@ body {
 <div id="viewer-wrap">
   <div id="panorama"></div>
 
+  <!-- Zone badge — shows current zone letter when in a named zone -->
+  <div id="zone-badge"></div>
+
   <!-- Hamburger button — mobile only -->
   <button id="hamburger" onclick="openSidebar()" aria-label="Open menu">&#9776;</button>
 
@@ -521,6 +565,16 @@ function hs_info(pitch, yaw, text, imgKey) {
 function hs_scene(pitch, yaw, text, sceneId) {
   return { type: 'scene', pitch, yaw, text, sceneId };
 }
+// Zone label hotspot — floating pill, clickable to navigate
+function hs_zone(pitch, yaw, label, sceneId) {
+  return {
+    type: 'info', pitch, yaw,
+    text: label,
+    cssClass: 'zone-lbl',
+    clickHandlerFunc: (e, a) => { e.stopPropagation(); go(a.id); },
+    clickHandlerArgs: { id: sceneId }
+  };
+}
 
 const SCENES = {
   ext_sw:  { title: 'Site Overview', zone: 'Exterior Approach — South-West', panorama: 'Panorama30.jpg', yaw: 60,  hotSpots: [ hs_scene(0,100,'East View →','ext_se'), hs_scene(0,-60,'← North-West','ext_nw') ] },
@@ -530,19 +584,19 @@ const SCENES = {
 
   dts: { title: 'DTS Interrogator & Enclosure', zone: 'DTS Equipment Station — Key Install Point', panorama: 'Panorama5.jpg', yaw: -60, hotSpots: [ hs_info(12,-55,'DTS Interrogator — tap for detail','dts_panel'), hs_scene(0,120,'Exit to Exterior','ext_nw'), hs_scene(0,-150,'Enter Cold Store →','cs1') ] },
 
-  cs1:  { title: 'Cold Store — Entry',   zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama6.jpg',  yaw: 0, hotSpots: [ hs_scene(0,-150,'← DTS Station','dts'),  hs_scene(0,30,'Continue →','cs2') ] },
-  cs2:  { title: 'Cold Store — Zone A',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama7.jpg',  yaw: 0, hotSpots: [ hs_scene(0,-160,'← Entry','cs1'),         hs_scene(0,30,'Continue →','cs3') ] },
-  cs3:  { title: 'Cold Store — Zone B',  zone: 'Cold Store · DTS Fiber Route Overhead',   panorama: 'Panorama8.jpg',  yaw: 0, hotSpots: [ hs_info(32,0,'DTS Fiber — Ceiling Route, tap for detail','ceiling_route'), hs_scene(0,-160,'← Zone A','cs2'), hs_scene(0,30,'Continue →','cs4') ] },
-  cs4:  { title: 'Cold Store — Zone C',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama9.jpg',  yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone B','cs3'),         hs_scene(0,30,'Continue →','cs5') ] },
-  cs5:  { title: 'Cold Store — Zone D',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama10.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone C','cs4'),         hs_scene(0,30,'Continue →','cs6') ] },
-  cs6:  { title: 'Cold Store — Zone E',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama11.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone D','cs5'),         hs_scene(0,30,'Continue →','cs7') ] },
-  cs7:  { title: 'Cold Store — Zone F',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama12.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone E','cs6'),         hs_scene(0,30,'Continue →','cs8') ] },
-  cs8:  { title: 'Cold Store — Zone G',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama13.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone F','cs7'),         hs_scene(0,30,'Continue →','cs9') ] },
-  cs9:  { title: 'Cold Store — Zone H',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama14.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone G','cs8'),         hs_scene(0,30,'Continue →','cs10') ] },
-  cs10: { title: 'Cold Store — Zone I',  zone: 'Cold Store · DTS Fiber Termination End',   panorama: 'Panorama15.jpg', yaw: 0, hotSpots: [ hs_info(5,-130,'Fiber Route — Far Wall Return, tap for detail','wall_route_2'), hs_scene(0,-160,'← Zone H','cs9'), hs_scene(0,30,'Continue →','cs11') ] },
-  cs11: { title: 'Cold Store — Zone J',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama16.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone I','cs10'),        hs_scene(0,30,'Continue →','cs12') ] },
-  cs12: { title: 'Cold Store — Zone K',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama17.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone J','cs11'),        hs_scene(0,30,'Continue →','cs13') ] },
-  cs13: { title: 'Cold Store — Zone L',  zone: 'Cold Store · Fiber Route Zone',            panorama: 'Panorama18.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Zone K','cs12'),        hs_scene(0,30,'Hangar →','hang1') ] },
+  cs1:  { title: 'Cold Store — Entry',  zoneLbl: null,    zone: 'Cold Store · Entry',                      panorama: 'Panorama6.jpg',  yaw: 0, hotSpots: [ hs_scene(0,-150,'← DTS Station','dts'),  hs_zone(-2,30,'ZONE A →','cs2') ] },
+  cs2:  { title: 'Cold Store — Zone A', zoneLbl: 'ZONE A', zone: 'Cold Store · Zone A',                    panorama: 'Panorama7.jpg',  yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ENTRY','cs1'),  hs_zone(-2,30,'ZONE B →','cs3') ] },
+  cs3:  { title: 'Cold Store — Zone B', zoneLbl: 'ZONE B', zone: 'Cold Store · Zone B — DTS Fiber Overhead', panorama: 'Panorama8.jpg',  yaw: 0, hotSpots: [ hs_info(32,0,'DTS Fiber — Ceiling Route, tap for detail','ceiling_route'), hs_zone(-2,-160,'← ZONE A','cs2'), hs_zone(-2,30,'ZONE C →','cs4') ] },
+  cs4:  { title: 'Cold Store — Zone C', zoneLbl: 'ZONE C', zone: 'Cold Store · Zone C',                    panorama: 'Panorama9.jpg',  yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE B','cs3'), hs_zone(-2,30,'ZONE D →','cs5') ] },
+  cs5:  { title: 'Cold Store — Zone D', zoneLbl: 'ZONE D', zone: 'Cold Store · Zone D',                    panorama: 'Panorama10.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE C','cs4'), hs_zone(-2,30,'ZONE E →','cs6') ] },
+  cs6:  { title: 'Cold Store — Zone E', zoneLbl: 'ZONE E', zone: 'Cold Store · Zone E',                    panorama: 'Panorama11.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE D','cs5'), hs_zone(-2,30,'ZONE F →','cs7') ] },
+  cs7:  { title: 'Cold Store — Zone F', zoneLbl: 'ZONE F', zone: 'Cold Store · Zone F',                    panorama: 'Panorama12.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE E','cs6'), hs_zone(-2,30,'ZONE G →','cs8') ] },
+  cs8:  { title: 'Cold Store — Zone G', zoneLbl: 'ZONE G', zone: 'Cold Store · Zone G',                    panorama: 'Panorama13.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE F','cs7'), hs_zone(-2,30,'ZONE H →','cs9') ] },
+  cs9:  { title: 'Cold Store — Zone H', zoneLbl: 'ZONE H', zone: 'Cold Store · Zone H',                    panorama: 'Panorama14.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE G','cs8'), hs_zone(-2,30,'ZONE I →','cs10') ] },
+  cs10: { title: 'Cold Store — Zone I', zoneLbl: 'ZONE I', zone: 'Cold Store · Zone I — DTS Termination End', panorama: 'Panorama15.jpg', yaw: 0, hotSpots: [ hs_info(5,-130,'Fiber Route — Far Wall Return, tap for detail','wall_route_2'), hs_zone(-2,-160,'← ZONE H','cs9'), hs_zone(-2,30,'ZONE J →','cs11') ] },
+  cs11: { title: 'Cold Store — Zone J', zoneLbl: 'ZONE J', zone: 'Cold Store · Zone J',                    panorama: 'Panorama16.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE I','cs10'), hs_zone(-2,30,'ZONE K →','cs12') ] },
+  cs12: { title: 'Cold Store — Zone K', zoneLbl: 'ZONE K', zone: 'Cold Store · Zone K',                    panorama: 'Panorama17.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE J','cs11'), hs_zone(-2,30,'ZONE L →','cs13') ] },
+  cs13: { title: 'Cold Store — Zone L', zoneLbl: 'ZONE L', zone: 'Cold Store · Zone L',                    panorama: 'Panorama18.jpg', yaw: 0, hotSpots: [ hs_zone(-2,-160,'← ZONE K','cs12'), hs_zone(-2,30,'HANGAR →','hang1') ] },
 
   hang1: { title: 'Hangar Structure',        zone: 'Hangar — Exterior',             panorama: 'Panorama19.jpg', yaw: 0, hotSpots: [ hs_scene(0,-160,'← Cold Store','cs13'), hs_scene(0,80,'Hangar Facade →','hang2'), hs_scene(0,30,'Enter Cable Passage →','br1') ] },
   hang2: { title: 'Hangar — Main Bifold Door', zone: 'Hangar — Large-Span Structure', panorama: 'Panorama20.jpg', yaw: 0, hotSpots: [ hs_scene(0,-80,'← Hangar Exterior','hang1'), hs_scene(0,80,'Cable Passage →','br1') ] },
@@ -607,7 +661,13 @@ function activate(id) {
   const el = document.getElementById('si_' + id);
   if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   const s = SCENES[id];
-  if (s) { document.getElementById('ov-title').textContent = s.title; document.getElementById('ov-zone').textContent = s.zone; }
+  if (s) {
+    document.getElementById('ov-title').textContent = s.title;
+    document.getElementById('ov-zone').textContent = s.zone;
+    const badge = document.getElementById('zone-badge');
+    if (s.zoneLbl) { badge.textContent = s.zoneLbl; badge.classList.add('visible'); }
+    else { badge.classList.remove('visible'); }
+  }
   const idx = SEQ.indexOf(id);
   document.getElementById('btn-prev').disabled = idx <= 0;
   document.getElementById('btn-next').disabled = idx >= SEQ.length - 1;
