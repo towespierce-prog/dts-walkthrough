@@ -439,6 +439,36 @@ body {
 #fw-box .fw-step b { color: #e87722; }
 #fw-box .fw-note { font-size: 11px; color: #555; }
 
+/* Sidebar powered-by — visible on mobile inside sidebar */
+#sidebar-powered {
+  display: none;
+  padding: 12px 14px 16px;
+  border-top: 1px solid #242424;
+}
+#sp-label {
+  font-size: 8px;
+  color: #444;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+#sp-logos {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+#sp-logos .arris-logo,
+#sp-logos .takenote-logo {
+  padding: 4px 8px;
+  flex: 1;
+  justify-content: center;
+}
+#sp-logos .arris-name { font-size: 14px; }
+#sp-logos .arris-sub { font-size: 8px; }
+#sp-logos .tn-flame { font-size: 18px; }
+#sp-logos .tn-name { font-size: 11px; }
+#sp-logos .tn-sub { font-size: 7px; }
+
 /* ── MOBILE BREAKPOINT ───────────────────────────────── */
 @media (max-width: 767px) {
   body { display: block; }
@@ -462,6 +492,8 @@ body {
   #hamburger { display: flex; }
 
   #legend-box { display: none; }
+  #powered-by { display: none; }
+  #sidebar-powered { display: block; }
 
   #overlay { padding: 60px 14px 80px; }
   #ov-title { font-size: 14px; }
@@ -552,6 +584,23 @@ body {
   <div id="bottom-key">
     <div class="key-row"><div class="key-dot" style="background:#3d8cff"></div> DTS fiber route visible</div>
     <div class="key-row"><div class="key-dot" style="background:#e87722"></div> Tap orange marker for detail</div>
+  </div>
+
+  <div id="sidebar-powered">
+    <div id="sp-label">Powered by</div>
+    <div id="sp-logos">
+      <div class="arris-logo">
+        <span class="arris-name">ARRIS</span>
+        <span class="arris-sub">Projects</span>
+      </div>
+      <div class="takenote-logo">
+        <span class="tn-flame">&#x1F525;</span>
+        <div class="tn-text">
+          <span class="tn-name">TAKE NOTE</span>
+          <span class="tn-sub">Internet of Things (IoT)</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
