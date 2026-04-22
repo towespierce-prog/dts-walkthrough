@@ -587,8 +587,50 @@ function hs_scene(pitch, yaw, text, sceneId) {
 function hs_zone(pitch, yaw, label, sceneId) {
   return {
     type: 'info', pitch, yaw,
-    cssClass: 'zone-lbl',
-    createTooltipFunc: (div) => { div.textContent = label; },
+    createTooltipFunc: (tooltipDiv) => {
+      // Style the inner tooltip div
+      tooltipDiv.textContent = label;
+      Object.assign(tooltipDiv.style, {
+        visibility: 'visible',
+        position: 'static',
+        background: 'transparent',
+        border: 'none',
+        borderRadius: '0',
+        padding: '0',
+        margin: '0',
+        boxShadow: 'none',
+        whiteSpace: 'nowrap',
+        color: '#e87722',
+        fontSize: '12px',
+        fontWeight: '800',
+        letterSpacing: '1.5px',
+        textTransform: 'uppercase',
+        fontFamily: 'Segoe UI, Arial, sans-serif',
+      });
+      // Style the parent hotspot div directly
+      const hs = tooltipDiv.parentElement;
+      Object.assign(hs.style, {
+        backgroundImage: 'none',
+        backgroundColor: 'rgba(12,12,12,0.88)',
+        border: '1.5px solid #e87722',
+        borderRadius: '16px',
+        width: 'auto',
+        height: 'auto',
+        padding: '6px 14px',
+        overflow: 'visible',
+        display: 'inline-flex',
+        alignItems: 'center',
+        cursor: 'pointer',
+      });
+      hs.onmouseenter = () => {
+        hs.style.backgroundColor = 'rgba(232,119,34,0.92)';
+        tooltipDiv.style.color = '#fff';
+      };
+      hs.onmouseleave = () => {
+        hs.style.backgroundColor = 'rgba(12,12,12,0.88)';
+        tooltipDiv.style.color = '#e87722';
+      };
+    },
     clickHandlerFunc: (e, a) => { e.stopPropagation(); go(a.id); },
     clickHandlerArgs: { id: sceneId }
   };
